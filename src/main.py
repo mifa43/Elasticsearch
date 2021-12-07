@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 import logging, uvicorn
 from crud import ElasticClass
-
+from models import SearchModels
 
 logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")
@@ -38,10 +38,12 @@ async def bulk_insert():
     print(bulk)
     return {"message": "data inserted"}
 
-@app.get("/search")
-async def search():
-    search_data = ElasticClass().searchData()
+@app.post("/search")
+async def search(dataModel: SearchModels):
+    search_data = ElasticClass().searchData(dataModel.model)
     print(search_data)
-    return {"query_result": f"{search_data}"}
+    return search_data
+
+
 if __name__ == "__main__":
     uvicorn.run(app, port=8080, loop="asyncio")
