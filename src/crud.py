@@ -33,30 +33,25 @@ class ElasticClass():
             # else:
             #     return self.es.indices.create(index="industry")
     def searchData(self, *args):
-        if type(args) == int:
-            body = {
-                    "from":0,
-                    "size":1000,
-                    "query": {
-                        "match": {
-                            "Sale Price":f"{args}"
-                        }
+        
+        body = {
+            "from":0,
+            "size":50,
+            "query": {
+                "match": {
+                    "Product Name":f"{args}"
                     }
-                }
-        else:
-            body = {
-                "from":0,
-                "size":1000,
-                "query": {
-                    "match": {
-                        "Product Name":f"{args}"
-                    }
-                }
             }
-        result = self.es.search(index="product", body=body, size=1000)
-        #for value in result["hits"]["hits"][0]["_source"]:
-        return{
-            "Model name": result["hits"]["hits"][0]["_source"]["Product Name"],
-            "Model url": result["hits"]["hits"][0]["_source"]["URL"],
-            "Model price": result["hits"]["hits"][0]["_source"]["Sale Price"]
-            }
+        }
+        result = self.es.search(index="product", body=body, size=50)
+        l = []
+        for i in range(len(result["hits"]["hits"])):
+            l.append({"Model name": result["hits"]["hits"][i]["_source"]["Product Name"],
+                "Model url": result["hits"]["hits"][i]["_source"]["URL"],
+                "Model price": result["hits"]["hits"][i]["_source"]["Sale Price"]})
+        return l
+        # return{
+        #     "Model name": result["hits"]["hits"][i]["_source"]["Product Name"],
+        #     "Model url": result["hits"]["hits"][i]["_source"]["URL"],
+        #     "Model price": result["hits"]["hits"][i]["_source"]["Sale Price"]
+        #     }
