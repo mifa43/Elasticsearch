@@ -3,4 +3,3 @@ from typing import Optional
 
 class SearchModels(BaseModel):
     model: Optional[str]
-    price: Optional[int]
