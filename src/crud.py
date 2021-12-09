@@ -43,7 +43,40 @@ class ElasticClass():
                     }
             }
         }
-        result = self.es.search(index="product", body=body, size=50)
+        body_query = {
+            "query": {
+                "bool": {
+                    "must": {
+                        "match": {
+                            "Sale Price": "2495"
+                        }
+                    }
+                }
+            }
+        }
+        filters = {
+            "query": {
+                "constant_score": { # ubrzaj query, kes  wrpaed
+                    "filter": {
+                        "term": {
+                            "Sale Price": "2495"
+                        }
+                    }
+                }
+            }
+        }
+        query_range = {
+            "query": {
+                "range": {
+                    "Sale Price": {
+                        "gte": "2495",
+                        "lte": "7495"
+                    }
+                }
+
+            }
+        }
+        result = self.es.search(index="product", body=query_range, size=50)
         l = []
         for i in range(len(result["hits"]["hits"])):
             l.append({"Model name": result["hits"]["hits"][i]["_source"]["Product Name"],
