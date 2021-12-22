@@ -8,6 +8,7 @@ class ElasticClass():
     def __init__(self):
         self.es = es = Elasticsearch(host="elastic_container", port= "9200", connection_class=RequestsHttpConnection, max_retries=30,
                        retry_on_timeout=True, request_timeout=30)
+
     def createIndex(self, name: str, id:int, doc:dict, alias: str) -> str:
         """
         :name predstavlja index name
@@ -63,19 +64,89 @@ class ElasticClass():
         """
         update = self.es.update(index=name, id=id, body={"doc": doc})
         return {"status": f"updejtovan je index:{name}, {doc}"}
-    
-    def bulkInsert(self):
+    def bulkInsert(self) -> str:
+        """
+        - Otvaranje i citanje csv fajla upisivanje u elastik uz bulk
+        """
         with open("nike_2020_04_13.csv", "r") as csv_file:
             reader = csv.DictReader(csv_file)
-            self.es.indices.create(index="product")
+            mapping = {
+                "mappings": {
+                    "properties": {
+                        
+                        "URL":{
+                            "type": "text"
+                        },
+                        "Product Name": {
+                            "type": "text"
+                        },
+                        "Product ID": {
+                            "type": "text"
+                        },
+                        "Listing Price": {
+                            "type": "text"
+                        },
+                        "Sale Price": {
+                            "type": "integer",
+                        },
+                        "Discount": {
+                            "type": "text"
+                        },
+                        "Brand": {
+                            "type": "text"
+                        },
+                        "Description": {
+                            "type": "text"
+                        },
+                        "Rating": {
+                            "type": "text"
+                        },
+                        "Reviews": {
+                            "type": "text"
+                        },
+                        "Images": {
+                            "type": "text"
+                        },
+                    }
+                }
+            }
+            self.es.indices.create(index="product", body=mapping)
             checker = self.es.indices.exists(index="first_index")
             print(checker)
             
             return helpers.bulk(self.es, reader, index="product")
-    
+    def bulkUpdate(self) -> str:
+        doc = {"doc": {"date": "1/1/2017"}}
+        return helpers.bulk(self.es, dict(doc), index="product")
 
-    def searchData(self, *args):
-        
+
+    def searchData(self, *args: str) -> str:
+        """
+        :args param
+        :body_query (range)
+            - pretraga po imenu produkta
+            - filtriranje po visini cene 
+            - parametri za polja <filedName> 
+            
+                - gt - vece od
+                - gte - veci ili jednak
+                - lt - manji od
+                - lte - manje ili jednako
+                - format - (optciono: str) :format datuma zamenjuje format u maperu 
+        - pretrazivanje podataka
+        # *parametri za polja nisu obavezna
+        """
+        # ovaj query se koristi samo kada zelimo sortirati vrednosti :asc od manjeg ka vecem, :des od veceg ka manjem 
+        ## sort="_score,Sale Price:asc"
+        match_all = {
+            "from":0,
+            "size":50,
+            "query": {
+                "match_all": {}
+            }
+        }
+
+        # pretraga po imenu produkta
         body = {
             "from":0,
             "size":50,
@@ -85,17 +156,26 @@ class ElasticClass():
                     }
             }
         }
+    
         body_query = {
             "query": {
                 "bool": {
                     "must": {
                         "match": {
-                            "Sale Price": "1111"
+                            "Product Name":f"{args}"
+                        },
+                    },
+                    "filter":{
+                        "range":{"Sale Price": {
+                            "gte": "111",
+                            "lte": "9990"
+                            }
                         }
                     }
                 }
             }
         }
+        #query filter
         filters = {
             "query": {
                 "constant_score": { # ubrzaj query, kes  wrpaed
@@ -119,7 +199,8 @@ class ElasticClass():
             }
         }
         
-        result = self.es.search(index="product", body=body_query, size=50)
+        result = self.es.search(index="product", body=match_all, size=999, sort="_score,Sale Price:asc")
+        
         l = []
         for i in range(len(result["hits"]["hits"])):
             l.append({"Model name": result["hits"]["hits"][i]["_source"]["Product Name"],
