@@ -16,6 +16,7 @@ class IndexExistsModel(BaseModel):
 class GetDocument(BaseModel):
     name: str
     id: int
+
 class UpdateDocument(BaseModel):
     name: str
     id: int
