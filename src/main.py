@@ -10,7 +10,7 @@ logger.setLevel("DEBUG")
 app = FastAPI()
 
 @app.get("/")
-async def helth_check():    
+async def helth_check():
     return {"Helth": "OK"}
 
 @app.post("/create-index")
@@ -43,17 +43,24 @@ async def get_document(index: GetDocument):
     document = ElasticClass().getDocument(index.name, index.id)
     print(document)
     return {"message": f"{document['status']}"}
+
 @app.put("/update-document")
 async def update_document(document: UpdateDocument):
     update = ElasticClass().updateDocument(document.name, document.id, document.doc)
     print(update)
     return {"message": f"{update['status']}"}
+
+
 @app.post("/bulk")
 async def bulk_insert():
     bulk = ElasticClass().bulkInsert()
     print(bulk)
     return {"message": "data inserted"}
 
+@app.post("/bulk-update")
+async def bulk_update():
+    update = ElasticClass().bulkUpdate()
+    return {"message": update}
 @app.post("/search")
 async def search(dataModel: SearchModels):
     search_data = ElasticClass().searchData(dataModel.model)
