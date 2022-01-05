@@ -61,17 +61,13 @@ async def bulk_insert():
 async def bulk_update():
     update = ElasticClass().bulkUpdate()
     return {"message": update}
+
 @app.post("/search")
 async def search(dataModel: SearchModels):
     search_data = ElasticClass().searchData(dataModel.model)
     print(search_data)
     return search_data
 
-@app.post("/update-document")
-async def updateDocument():
-    update = ElasticClass().updateDoc()
-    print(update)
-    return {"message": f"Document updated {update}"}
 
 
 if __name__ == "__main__":

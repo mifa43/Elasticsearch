@@ -12,12 +12,28 @@ class ElasticClass():
     def createIndex(self, name: str, id:int, doc:dict, alias: str) -> str:
         """
         :name predstavlja index name
-        :id index_id
+        :id document_id
         :doc dokumenti u index-u
         :alias index
 
         - Za id moze da se koristi uuid ali nijer obavezno jer elastic takodje i sam definise id
         """
+        mapping = {
+                "mappings": {
+                    "properties": {
+                        
+                        "ime":{
+                            "type": "text"
+                        },
+                        "prezime": {
+                            "type": "text"
+                        },
+                        "plata": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
         response = self.es.index(index=name, id=id, body=doc)
         alias = self.es.indices.put_alias(index=name, name=alias)
         return {"status": f"index {name} kreiran"}
@@ -111,7 +127,7 @@ class ElasticClass():
                 }
             }
             self.es.indices.create(index="product", body=mapping)
-            checker = self.es.indices.exists(index="first_index")
+            checker = self.es.indices.exists(index="product")
             print(checker)
             
             return helpers.bulk(self.es, reader, index="product")
@@ -152,7 +168,7 @@ class ElasticClass():
             "size":50,
             "query": {
                 "match": {
-                    "Product Name":f"{args}"
+                    "ime":f"{args}"
                     }
             }
         }
@@ -202,8 +218,15 @@ class ElasticClass():
         result = self.es.search(index="product", body=match_all, size=999, sort="_score,Sale Price:asc")
         
         l = []
+        print(result)
         for i in range(len(result["hits"]["hits"])):
+        #     l.append({"ime": result["hits"]["hits"][i]["_source"]["ime"],
+        #         "prezime": result["hits"]["hits"][i]["_source"]["prezime"],
+        #         "plata": result["hits"]["hits"][i]["_source"]["plata"]})
+        # return l
+
+
             l.append({"Model name": result["hits"]["hits"][i]["_source"]["Product Name"],
-                "Model url": result["hits"]["hits"][i]["_source"]["URL"],
-                "Model price": result["hits"]["hits"][i]["_source"]["Sale Price"]})
-        return l
+                    "Model url": result["hits"]["hits"][i]["_source"]["URL"],
+                    "Model price": result["hits"]["hits"][i]["_source"]["Sale Price"]})
+            return l
