@@ -1,4 +1,5 @@
 from os import PRIO_PGRP
+from typing import AsyncContextManager
 from fastapi import FastAPI
 import logging, uvicorn
 from crud import ElasticClass
@@ -68,6 +69,19 @@ async def search(dataModel: SearchModels):
     print(search_data)
     return search_data
 
+@app.get("/create-parquet")
+async def parquet():
+    parquet_read = ElasticClass().create_parquet()
+
+    print(parquet_read)
+    return{"message": "parquet file is created"}
+
+@app.get("/write-parquet-to-elastic")
+async def parquet_to_elastic():
+    data = ElasticClass().write_parquet_to_elastic()
+    print(data)
+
+    return{"message": "file is writen"}
 
 
 if __name__ == "__main__":
