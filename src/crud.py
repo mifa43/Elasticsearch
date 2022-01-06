@@ -4,6 +4,9 @@ from elasticsearch.exceptions import ConnectionError
 from datetime import datetime
 import csv
 import json
+import pyarrow.parquet as parquet
+import pandas
+import pyarrow as pa
 class ElasticClass():
     def __init__(self):
         self.es = es = Elasticsearch(host="elastic_container", port= "9200", connection_class=RequestsHttpConnection, max_retries=30,
@@ -16,7 +19,7 @@ class ElasticClass():
         :doc dokumenti u index-u
         :alias index
 
-        - Za id moze da se koristi uuid ali nijer obavezno jer elastic takodje i sam definise id
+        - Za id moze da se koristi uuid ali nije obavezno jer elastic takodje i sam definise id
         """
         mapping = {
                 "mappings": {
@@ -230,3 +233,40 @@ class ElasticClass():
                     "Model url": result["hits"]["hits"][i]["_source"]["URL"],
                     "Model price": result["hits"]["hits"][i]["_source"]["Sale Price"]})
             return l
+    def create_parquet(self):
+        """
+        - Kreiranje parquet tabele
+        """
+        # kreiranje data frejma 
+        ## ime - row
+        ## milos - column
+        ## 123 - index 
+        df = pandas.DataFrame({
+            "ime": ["Milos", "Nikola", "Jovan"],
+            "prezime": ["Zlatkovic", "Djokic", "Kokic"],
+            "godine": [21, 44, 38]
+        }, index = list('123'))
+        # pyarrow kreira tabelu i iz pandasa kao argument uzima df(dataFrame)
+        table = pa.Table.from_pandas(df)
+        #kreiranje tabele i imenovanje
+        parquet.write_table(table, "exemple.parquet")
+        # citanje tabele
+        table2 = parquet.read_table("exemple.parquet")
+        # tabelu saljemo u pandas
+        table2.to_pandas()
+        # citamo tabelu, column kolone koje prikazujemo
+        table3 = parquet.read_pandas("exemple.parquet", columns=["ime", "prezime", "godine"]).to_pandas()
+        print(table3)
+        return {"table": table}
+    def write_parquet_to_elastic(self):
+        table = self.create_parquet()
+        s = table["table"]["ime"]
+        for i in range(len(s)):
+            # print(table["table"]["ime"][i], table["table"]["prezime"][i], table["table"]["godine"][i])
+            # print("ASD".lower())
+            l = []
+            l.append(str(table["table"]["ime"][i]))
+            
+            dic = {"ime": str(table["table"]["ime"][i]),"prezime": str(table["table"]["prezime"][i]),"godine": str(table["table"]["godine"][i])}
+            self.createIndex(f"{l[0]}".lower(),s, dic, "zaposleni-".join(l))
+            
