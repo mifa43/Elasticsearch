@@ -12,7 +12,7 @@ class ElasticClass():
         self.es = es = Elasticsearch(host="elastic_container", port= "9200", connection_class=RequestsHttpConnection, max_retries=30,
                        retry_on_timeout=True, request_timeout=30)
 
-    def createIndex(self, name: str, id:int, doc:dict, alias: str) -> str:
+    def createIndex(self, name: str) -> str:    #, id:int, doc:dict, alias: str
         """
         :name predstavlja index name
         :id document_id
@@ -21,25 +21,36 @@ class ElasticClass():
 
         - Za id moze da se koristi uuid ali nije obavezno jer elastic takodje i sam definise id
         """
-        mapping = {
-                "mappings": {
-                    "properties": {
+        # mapping = {
+        #         "mappings": {
+        #             "properties": {
                         
-                        "ime":{
-                            "type": "text"
-                        },
-                        "prezime": {
-                            "type": "text"
-                        },
-                        "plata": {
-                            "type": "integer"
-                        }
-                    }
-                }
-            }
-        response = self.es.index(index=name, id=id, body=doc)
-        alias = self.es.indices.put_alias(index=name, name=alias)
+        #                 "ime":{
+        #                     "type": "text"
+        #                 },
+        #                 "prezime": {
+        #                     "type": "text"
+        #                 },
+        #                 "plata": {
+        #                     "type": "integer"
+        #                 }
+        #             }
+        #         }
+        #     }
+        # response = self.es.index(index=name, id=id, body=doc)
+        # alias = self.es.indices.put_alias(index=name, name=alias)
+        self.es.indices.create(index=f"{name}")
         return {"status": f"index {name} kreiran"}
+    def create_index_bulk(self, index_name):
+        for i in index_name:
+            print(i["name"])
+            self.es.indices.create(index=f"{i['name']}")
+        return {"name": index_name}
+
+    def create_document_bulk(self, index_name,document):
+        
+        return helpers.bulk(self.es, actions=document, index=f"{index_name}")
+
     def deleteIndex(self, name: str) -> str:
         """
         :name index_name
@@ -259,14 +270,14 @@ class ElasticClass():
         print(table3)
         return {"table": table}
     def write_parquet_to_elastic(self):
+        """
+        - Citanje parquet fajla i upisivanje u elasticSearch
+        """
         table = self.create_parquet()
         s = table["table"]["ime"]
         for i in range(len(s)):
-            # print(table["table"]["ime"][i], table["table"]["prezime"][i], table["table"]["godine"][i])
-            # print("ASD".lower())
             l = []
             l.append(str(table["table"]["ime"][i]))
-            
             dic = {"ime": str(table["table"]["ime"][i]),"prezime": str(table["table"]["prezime"][i]),"godine": str(table["table"]["godine"][i])}
             self.createIndex(f"{l[0]}".lower(),s, dic, "zaposleni-".join(l))
             
