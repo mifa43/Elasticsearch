@@ -1,11 +1,14 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import List, Optional
 
 class CreateIndexModel(BaseModel):
-    name: str
-    id: int
-    doc: dict
-    alias: str
+    indices: list   # name str
+    # id: int
+    # doc: dict
+    # alias: str
+class CreateDocumentBulk(BaseModel):
+    indices: str
+    document: list
 
 class DeleteIndexModel(BaseModel):
     name: str
