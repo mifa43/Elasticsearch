@@ -3,7 +3,7 @@ from typing import AsyncContextManager
 from fastapi import FastAPI
 import logging, uvicorn
 from crud import ElasticClass
-from models import CreateIndexModel, DeleteIndexModel, GetDocument, IndexExistsModel, SearchModels, UpdateDocument
+from models import *
 
 logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")
@@ -16,10 +16,22 @@ async def helth_check():
 
 @app.post("/create-index")
 async def create_index(index: CreateIndexModel):
-    el = ElasticClass().createIndex(index.name, index.id, index.doc, index.alias)
+    el = ElasticClass().createIndex(index.name) #index.id, index.doc, index.alias
     print(el)
 
     return {"messasge": el["status"]}
+
+@app.post("/create-index-bulk")
+async def create_index_bulk(model: CreateIndexModel):
+    s = ElasticClass().create_index_bulk(model.indices)
+    print(s["name"])
+    return {"indices": "kreiran"}
+    
+@app.post("/create-document-bulk")
+async def create_document_bulk(model: CreateDocumentBulk):
+    add = ElasticClass().create_document_bulk(model.indices, model.document)
+    print(add)
+    return{"message":"dodat novi document"}
 
 @app.delete("/delete-index")
 async def delete_index(index: DeleteIndexModel):
