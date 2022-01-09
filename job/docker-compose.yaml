@@ -1,0 +1,21 @@
+version: '3'
+
+volumes:
+  job_data:
+      driver: local
+      
+services:
+  job:
+    container_name: job
+    build:
+      context: ./
+    image: jobs
+    ports:
+      - 8082:8080
+    networks:
+      - elastic_dev
+
+networks:
+  elastic_dev:
+    external:
+      name: elastic_dev
