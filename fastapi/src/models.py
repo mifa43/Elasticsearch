@@ -2,10 +2,8 @@ from pydantic import BaseModel
 from typing import List, Optional
 
 class CreateIndexModel(BaseModel):
-    indices: str   # name str
-    # id: int
-    # doc: dict
-    # alias: str
+    indices: str
+  
 class CreateDocumentBulk(BaseModel):
     indices: str
     document: list

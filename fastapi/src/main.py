@@ -16,7 +16,7 @@ async def helth_check():
 
 @app.post("/create-index")
 async def create_index(index: CreateIndexModel):
-    el = ElasticClass().createIndex(index.indices) #index.id, index.doc, index.alias
+    el = ElasticClass().createIndex(index.indices)
     print(el)
 
     return {"messasge": el["status"]}
