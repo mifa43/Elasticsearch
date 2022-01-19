@@ -29,3 +29,7 @@ class UpdateDocument(BaseModel):
     
 class SearchModels(BaseModel):
     model: Optional[str]
+
+class bulk(BaseModel):
+    indices: str
+    document: list
