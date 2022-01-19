@@ -69,15 +69,10 @@ async def update_document(document: UpdateDocument):
 
 
 @app.post("/bulk")
-async def bulk_insert():
-    bulk = ElasticClass().bulkInsert()
+async def bulk_insert(model: bulk):
+    bulk = ElasticClass().bulkInsert(model.indices, model.document)
     print(bulk)
     return {"message": "data inserted"}
-
-@app.post("/bulk-update")
-async def bulk_update():
-    update = ElasticClass().bulkUpdate()
-    return {"message": update}
 
 @app.post("/search")
 async def search(dataModel: SearchModels):
