@@ -38,7 +38,7 @@ import csv
 
 def send_request_helpers_bulk() -> str:
     """
-    Definicija koja cita csv fajl i salje request na api gde se upisuje u elastic
+    Definicija koja cita csv fajl i salje request na api gde se upisuje u elastic bulk helpers
     """
     df = pad.read_csv("nike_2020_04_13.csv")
     l = []
