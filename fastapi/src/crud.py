@@ -98,61 +98,57 @@ class ElasticClass():
         """
         update = self.es.update(index=name, id=id, body={"doc": doc})
         return {"status": f"updejtovan je index:{name}, {doc}"}
-    def bulkInsert(self) -> str:
+    def bulkInsert(self, indices, document) -> str:
         """
         - Otvaranje i citanje csv fajla upisivanje u elastik uz bulk
         """
-        with open("nike_2020_04_13.csv", "r") as csv_file:
-            reader = csv.DictReader(csv_file)
-            mapping = {
-                "mappings": {
-                    "properties": {
-                        
-                        "URL":{
-                            "type": "text"
-                        },
-                        "Product Name": {
-                            "type": "text"
-                        },
-                        "Product ID": {
-                            "type": "text"
-                        },
-                        "Listing Price": {
-                            "type": "text"
-                        },
-                        "Sale Price": {
-                            "type": "integer",
-                        },
-                        "Discount": {
-                            "type": "text"
-                        },
-                        "Brand": {
-                            "type": "text"
-                        },
-                        "Description": {
-                            "type": "text"
-                        },
-                        "Rating": {
-                            "type": "text"
-                        },
-                        "Reviews": {
-                            "type": "text"
-                        },
-                        "Images": {
-                            "type": "text"
-                        },
-                    }
+        #with open("nike_2020_04_13.csv", "r") as csv_file:
+        #reader = csv.DictReader(csv_file)
+        mapping = {
+            "mappings": {
+                "properties": {
+                    
+                    "URL":{
+                        "type": "text"
+                    },
+                    "Product Name": {
+                        "type": "text"
+                    },
+                    "Product ID": {
+                        "type": "text"
+                    },
+                    "Listing Price": {
+                        "type": "text"
+                    },
+                    "Sale Price": {
+                        "type": "integer",
+                    },
+                    "Discount": {
+                        "type": "text"
+                    },
+                    "Brand": {
+                        "type": "text"
+                    },
+                    "Description": {
+                        "type": "text"
+                    },
+                    "Rating": {
+                        "type": "text"
+                    },
+                    "Reviews": {
+                        "type": "text"
+                    },
+                    "Images": {
+                        "type": "text"
+                    },
                 }
             }
-            self.es.indices.create(index="product", body=mapping)
-            checker = self.es.indices.exists(index="product")
-            print(checker)
-            
-            return helpers.bulk(self.es, reader, index="product")
-    def bulkUpdate(self) -> str:
-        doc = {"doc": {"date": "1/1/2017"}}
-        return helpers.bulk(self.es, dict(doc), index="product")
-
+        }
+        self.es.indices.create(index=f"{indices}", body=mapping)
+        checker = self.es.indices.exists(index=f"{indices}")
+        print(checker)
+        
+        return helpers.bulk(self.es, document, index=f"{indices}")
 
     def searchData(self, *args: str) -> str:
         """
