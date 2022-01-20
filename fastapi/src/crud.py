@@ -280,4 +280,6 @@ class ElasticClass():
             l.append(str(table["table"]["ime"][i]))
             dic = {"ime": str(table["table"]["ime"][i]),"prezime": str(table["table"]["prezime"][i]),"godine": str(table["table"]["godine"][i])}
             self.createIndex(f"{l[0]}".lower(),s, dic, "zaposleni-".join(l))
-            
+    
+
+# #https://www.sphinx-doc.org/en/master/
