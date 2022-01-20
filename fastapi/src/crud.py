@@ -14,11 +14,11 @@ class ElasticClass():
 
     def createIndex(self, name: str) -> str:    #, id:int, doc:dict, alias: str
         """
-        :name predstavlja index name
-        :id document_id
-        :doc dokumenti u index-u
-        :alias index
-
+        ``:name`` predstavlja index name
+        ``:id`` document_id
+        ``:doc`` dokumenti u index-u
+        ``:alias`` index
+        
         - Za id moze da se koristi uuid ali nije obavezno jer elastic takodje i sam definise id
         """
         # mapping = {
@@ -57,7 +57,7 @@ class ElasticClass():
 
     def deleteIndex(self, name: str) -> str:
         """
-        :name index_name
+        ``:name`` index_name
 
         - Brisanje index-a uzima parametar name sto predstavlja index_name
         """
@@ -71,7 +71,7 @@ class ElasticClass():
         return {"status": index} # lista svih index-a
     def indexCheck(self, name) -> str:
         """
-        :name index_name
+        ``:name`` index_name
 
         - Za parametar uzima index_name i vraca True ako postoji 
         """
@@ -79,8 +79,8 @@ class ElasticClass():
         return {"status": f"{name}: {exists}"}
     def getDocument(self, name: str, id: int) -> str:
         """
-        :name index_name
-        :id index_id
+        ``:name`` index_name
+        ``:id`` index_id
 
         - Uzimanje vrednosti iz index-a
         """
@@ -89,12 +89,12 @@ class ElasticClass():
         return {"status": response["_source"]}
     def updateDocument(self, name:str, id: int, doc: dict) -> str:
         """
-        :name predstavlja index name
-        :id index_id
-        :doc dokumenti u index-u
+        ``:name`` predstavlja index name
+        ``:id`` index_id
+        ``:doc`` dokumenti u index-u
 
         - Param doc predstavlja dokumente i koristimo dict za update row/coll
-        - *U body se salje dict {doc: param}
+        - *U body se salje dict {``doc: param``}
         """
         update = self.es.update(index=name, id=id, body={"doc": doc})
         return {"status": f"updejtovan je index:{name}, {doc}"}
@@ -152,17 +152,17 @@ class ElasticClass():
 
     def searchData(self, *args: str) -> str:
         """
-        :args param
-        :body_query (range)
+        ``:args param``
+        ``:body_query`` (range)
             - pretraga po imenu produkta
             - filtriranje po visini cene 
             - parametri za polja <filedName> 
             
-                - gt - vece od
-                - gte - veci ili jednak
-                - lt - manji od
-                - lte - manje ili jednako
-                - format - (optciono: str) :format datuma zamenjuje format u maperu 
+                - ``gt`` - vece od
+                - ``gte`` - veci ili jednak
+                - ``lt`` - manji od
+                - ``lte`` - manje ili jednako
+                - ``format`` - (optciono: str) :format datuma zamenjuje format u maperu 
         - pretrazivanje podataka
         # *parametri za polja nisu obavezna
         """
