@@ -15,9 +15,6 @@ class ElasticClass():
     def createIndex(self, name: str) -> str:    #, id:int, doc:dict, alias: str
         """
         ``:name`` predstavlja index name
-        ``:id`` document_id
-        ``:doc`` dokumenti u index-u
-        ``:alias`` index
         
         - Za id moze da se koristi uuid ali nije obavezno jer elastic takodje i sam definise id
         """
@@ -39,8 +36,12 @@ class ElasticClass():
         #     }
         # response = self.es.index(index=name, id=id, body=doc)
         # alias = self.es.indices.put_alias(index=name, name=alias)
-        self.es.indices.create(index=f"{name}")
-        return {"status": f"index {name} kreiran"}
+        check_exists = self.es.indices.exists(index=f"{name}")
+        if check_exists == False:
+            self.es.indices.create(index=f"{name}")
+            return {"status": f"index '{name}' kreiran", "exists": False}
+        else:
+            return {"status": f"index '{name}' vec postoji", "exists": True}
     def create_index_bulk(self, index_name):
         for i in index_name:
             print(i["name"])
