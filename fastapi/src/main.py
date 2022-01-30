@@ -1,6 +1,5 @@
-from os import PRIO_PGRP
 from typing import AsyncContextManager
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 import logging, uvicorn
 from crud import ElasticClass
 from models import *
@@ -14,7 +13,7 @@ ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 
 # format
-formatter = logging.Formatter('%(levelname)s:     %(name)s.%(funcName)s: %(message)s')
+formatter = logging.Formatter('%(levelname)s:    %(name)s.%(funcName)s: %(message)s')
 
 # dodaj format u consol-u
 ch.setFormatter(formatter)
@@ -33,8 +32,11 @@ async def helth_check():
 @app.post("/create-index")
 async def create_index(index: CreateIndexModel):
     el = ElasticClass().createIndex(index.indices)
-    print(el)
-
+    if el["exists"] == False:
+        logger.info("{message : '%s'}, 200"%(el["status"]))
+    else:
+        logger.exception("index '%s' vec postoji"%(index.indices))
+        raise HTTPException(status_code=409, detail="index '{0}' vec postoji".format(index.indices))
     return {"messasge": el["status"]}
 
 @app.post("/create-index-bulk")
