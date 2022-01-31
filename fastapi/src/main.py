@@ -70,7 +70,11 @@ async def delete_index(index: DeleteIndexModel):
 @app.get("/get-indexs")
 async def get_indexs():
     index = ElasticClass().getIndexs()
-    print(index)
+    if index["exists"] == True:
+        logger.info("pronadjeni su postojeci index-i, 200")
+    else:
+        logger.exception("nema postojecih indexa, 404")
+        raise HTTPException(status_code=404, detail="nema postojecih indexa")
     return {"message": f"index {index['status']} found"}
 
 @app.post("/get-index-exists")
