@@ -70,13 +70,18 @@ class ElasticClass():
             return {"status": f"index {name} je izbrisan", "exists": True}
         else:
             return {"status": f"index {name} nije pronadjen", "exists": False}
-            
+
     def getIndexs(self) -> str:
         """
         - Vraca listu svih index-a
         """
         index = self.es.indices.get_alias("*")
-        return {"status": index} # lista svih index-a
+        counter = len(index)
+        if counter == 0:
+            return {"status": "nema postojecih index-a", "exists": False}
+        else:
+            return {"status": index, "exists": True} # lista svih index-a
+
     def indexCheck(self, name) -> str:
         """
         ``:name`` index_name
@@ -84,7 +89,7 @@ class ElasticClass():
         - Za parametar uzima index_name i vraca True ako postoji 
         """
         exists = self.es.indices.exists(index=name)
-        return {"status": f"{name}: {exists}"}
+        return {"status": {f"{name}: {exists}"}}
     def getDocument(self, name: str, id: int) -> str:
         """
         ``:name`` index_name
