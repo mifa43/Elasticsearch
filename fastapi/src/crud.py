@@ -1,3 +1,4 @@
+from curses import flash
 from elasticsearch import Elasticsearch, RequestsHttpConnection, helpers
 import time
 from elasticsearch.exceptions import ConnectionError
@@ -42,11 +43,12 @@ class ElasticClass():
             return {"status": f"index '{name}' kreiran", "exists": False}
         else:
             return {"status": f"index '{name}' vec postoji", "exists": True}
-    def create_index_bulk(self, index_name):
-        for i in index_name:
-            print(i["name"])
-            self.es.indices.create(index=f"{i['name']}")
-        return {"name": index_name}
+
+    # def create_index_bulk(self, index_name):
+    #     for i in index_name:
+    #         print(i["name"])
+    #         self.es.indices.create(index=f"{i['name']}")
+    #     return {"name": index_name}
 
     def create_document_bulk(self, index_name,document):
         
@@ -62,8 +64,13 @@ class ElasticClass():
 
         - Brisanje index-a uzima parametar name sto predstavlja index_name
         """
-        self.es.indices.delete(index=name)
-        return {"status": f"index {name} je izbrisan"}
+        check_exists = self.es.indices.exists(index=f"{name}")
+        if check_exists == True:
+            self.es.indices.delete(index=name)
+            return {"status": f"index {name} je izbrisan", "exists": True}
+        else:
+            return {"status": f"index {name} nije pronadjen", "exists": False}
+            
     def getIndexs(self) -> str:
         """
         - Vraca listu svih index-a
