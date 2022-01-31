@@ -13,7 +13,7 @@ ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 
 # format
-formatter = logging.Formatter('%(levelname)s:    %(name)s.%(funcName)s: %(message)s')
+formatter = logging.Formatter('%(levelname)s:     %(name)s.%(funcName)s: %(message)s')
 
 # dodaj format u consol-u
 ch.setFormatter(formatter)
@@ -39,28 +39,34 @@ async def create_index(index: CreateIndexModel):
         raise HTTPException(status_code=409, detail="index '{0}' vec postoji".format(index.indices))
     return {"messasge": el["status"]}
 
-@app.post("/create-index-bulk")
-async def create_index_bulk(model: CreateIndexModel):
-    s = ElasticClass().create_index_bulk(model.indices)
-    print(s["name"])
-    return {"indices": "kreiran"}
+# @app.post("/create-index-bulk")
+# async def create_index_bulk(model: CreateIndexModel):
+#     s = ElasticClass().create_index_bulk(model.indices)
+#     print(s["name"])
+#     return {"indices": "kreiran"}
     
 @app.post("/create-document-bulk")
 async def create_document_bulk(model: CreateDocumentBulk):
     add = ElasticClass().create_document_bulk(model.indices, model.document)
-    print(add)
-    return{"message":"dodat novi document"}
+    logger.info("{Kreiran novi index: %s}, 200"%model.indices)
+    return{"message": "Kreiran novi index"}
+
 @app.post("/create-document-bulk-job")
 async def create_document_bulk_job_request(model: CreateDocumentBulkJob):
     job = ElasticClass().create_document_bulk_job(model.indices, model.document)
-    return {"message": "novi dokument je dodan"}
+    logger.info("{Kreiran novi index: %s}, 200"%model.indices)
+    return {"message": "Kreiran novi index"}
     
 @app.delete("/delete-index")
 async def delete_index(index: DeleteIndexModel):
     delete = ElasticClass().deleteIndex(index.name)
-    print(delete) 
-
+    if delete["exists"] == True:
+        logger.info("{izbrisan je index: %s}, 200"%index.name)
+    else:
+        logger.exception("index %s nije pronadjen, 404"%index.name)
+        raise HTTPException(status_code=404, detail="index %s nije pronadjen"%index.name)
     return {"message": delete["status"]}
+
 @app.get("/get-indexs")
 async def get_indexs():
     index = ElasticClass().getIndexs()
