@@ -20,7 +20,7 @@ class IndexExistsModel(BaseModel):
 
 class GetDocument(BaseModel):
     name: str
-    id: int
+    id: str
 
 class UpdateDocument(BaseModel):
     name: str
