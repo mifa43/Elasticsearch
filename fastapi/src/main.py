@@ -1,3 +1,4 @@
+from pydoc import doc
 from typing import AsyncContextManager
 from fastapi import FastAPI, HTTPException
 import logging, uvicorn
@@ -77,16 +78,16 @@ async def get_indexs():
         raise HTTPException(status_code=404, detail="nema postojecih indexa")
     return {"message": f"index {index['status']} found"}
 
-@app.post("/get-index-exists")
-async def index_exits_check(index: IndexExistsModel):
-    exists = ElasticClass().indexCheck(index.name)
-    print(exists)
-    return {"message": exists["status"]}
-
 @app.post("/get-document")
 async def get_document(index: GetDocument):
     document = ElasticClass().getDocument(index.name, index.id)
-    print(document)
+    if document["exists"] ==  True:
+        logger.info("pronadjen je document: %s, 200"%index.name)
+        if not index.id:
+           pass
+    else:
+        logger.exception("document/document_id nije pronadjen, 404")
+        raise HTTPException(status_code=404, detail="document: %s ili document_id: %s nije pronadjen"%(index.name,index.id))
     return {"message": f"{document['status']}"}
 
 @app.put("/update-document")
