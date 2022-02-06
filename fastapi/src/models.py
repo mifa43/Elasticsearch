@@ -24,7 +24,7 @@ class GetDocument(BaseModel):
 
 class UpdateDocument(BaseModel):
     name: str
-    id: int
+    id: str
     doc: dict
     
 class SearchModels(BaseModel):
