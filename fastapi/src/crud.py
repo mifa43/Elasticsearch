@@ -82,24 +82,23 @@ class ElasticClass():
         else:
             return {"status": index, "exists": True} # lista svih index-a
 
-    def indexCheck(self, name) -> str:
-        """
-        ``:name`` index_name
-
-        - Za parametar uzima index_name i vraca True ako postoji 
-        """
-        exists = self.es.indices.exists(index=name)
-        return {"status": {f"{name}: {exists}"}}
     def getDocument(self, name: str, id: int) -> str:
         """
         ``:name`` index_name
         ``:id`` index_id
 
-        - Uzimanje vrednosti iz index-a
+        - Uzimanje vrednosti iz documenta-a
         """
-        response = self.es.get(index=name, id=id)
+        check_exists = self.es.indices.exists(index=f"{name}")
+        if check_exists == True:
+            try:
+                response = self.es.get(index=name, id=id)
+                return {"status": response["_source"], "exists": True}
+            except:
+                return {"exists": False}
+        else:
+            return {"status": f"index {name} nije pronadjen", "exists": False}
 
-        return {"status": response["_source"]}
     def updateDocument(self, name:str, id: int, doc: dict) -> str:
         """
         ``:name`` predstavlja index name
