@@ -82,7 +82,7 @@ class ElasticClass():
         else:
             return {"status": index, "exists": True} # lista svih index-a
 
-    def getDocument(self, name: str, id: int) -> str:
+    def getDocument(self, name: str, id: str) -> str:
         """
         ``:name`` index_name
         ``:id`` index_id
@@ -99,7 +99,7 @@ class ElasticClass():
         else:
             return {"status": f"index {name} nije pronadjen", "exists": False}
 
-    def updateDocument(self, name:str, id: int, doc: dict) -> str:
+    def updateDocument(self, name:str, id: str, doc: dict) -> str:
         """
         ``:name`` predstavlja index name
         ``:id`` index_id
@@ -108,8 +108,17 @@ class ElasticClass():
         - Param doc predstavlja dokumente i koristimo dict za update row/coll
         - *U body se salje dict {``doc: param``}
         """
-        update = self.es.update(index=name, id=id, body={"doc": doc})
-        return {"status": f"updejtovan je index:{name}, {doc}"}
+        check_exists = self.es.indices.exists(index=f"{name}")
+        if check_exists == True:
+            try:
+                update = self.es.update(index=name, id=id, body={"doc": doc})
+                return {"status": f"updejtovan je index:{name}, {doc}", "exists": True}
+            except:
+                return {"exists": False}
+        else:
+            return {"status": f"index {name} nije pronadjen", "exists": False}
+        
+
     def bulkInsert(self, indices, document) -> str:
         """
         - Otvaranje i citanje csv fajla upisivanje u elastik uz bulk
