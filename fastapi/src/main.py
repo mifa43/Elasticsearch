@@ -83,8 +83,8 @@ async def get_document(index: GetDocument):
     document = ElasticClass().getDocument(index.name, index.id)
     if document["exists"] ==  True:
         logger.info("pronadjen je document: %s, 200"%index.name)
-        if not index.id:
-           pass
+        # if not index.id:
+        #    pass
     else:
         logger.exception("document/document_id nije pronadjen, 404")
         raise HTTPException(status_code=404, detail="document: %s ili document_id: %s nije pronadjen"%(index.name,index.id))
@@ -93,7 +93,12 @@ async def get_document(index: GetDocument):
 @app.put("/update-document")
 async def update_document(document: UpdateDocument):
     update = ElasticClass().updateDocument(document.name, document.id, document.doc)
-    print(update)
+    if update["exists"] ==  True:
+        logger.info("pronadjen je document: %s, 200"%document.name)
+        
+    else:
+        logger.exception("document/document_id nije pronadjen, 404")
+        raise HTTPException(status_code=404, detail="document: %s ili document_id: %s nije pronadjen"%(document.name,document.id))
     return {"message": f"{update['status']}"}
 
 
