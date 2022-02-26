@@ -119,14 +119,14 @@ async def parquet():
     parquet_read = ElasticClass().create_parquet()
 
     print(parquet_read)
-    return{"message": "parquet file is created"}
+    return{"message": "parquet file je kreiran"}
 
 @app.get("/write-parquet-to-elastic")
 async def parquet_to_elastic():
     data = ElasticClass().write_parquet_to_elastic()
     print(data)
 
-    return{"message": "file is writen"}
+    return{"message": "file je upisan"}
 
 
 if __name__ == "__main__":
