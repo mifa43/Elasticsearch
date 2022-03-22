@@ -165,11 +165,12 @@ class ElasticClass():
                 }
             }
         }
-        self.es.indices.create(index=f"{indices}", body=mapping)
-        checker = self.es.indices.exists(index=f"{indices}")
-        print(checker)
-        
-        return helpers.bulk(self.es, document, index=f"{indices}")
+        check_exists = self.es.indices.exists(index=f"{indices}")
+        if check_exists == True:
+            return {"exists": True}
+        else:
+            self.es.indices.create(index=f"{indices}", body=mapping)
+            return {"func": helpers.bulk(self.es, document, index=f"{indices}"), "exists": False}
 
     def searchData(self, *args: str) -> str:
         """
