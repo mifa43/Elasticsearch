@@ -105,7 +105,11 @@ async def update_document(document: UpdateDocument):
 @app.post("/bulk")
 async def bulk_insert(model: bulk):
     bulk = ElasticClass().bulkInsert(model.indices, model.document)
-    print(bulk)
+    if bulk['exists'] == True:
+        logger.info("Index vec postoji: %s, 409"%model.indices)
+        raise HTTPException(status_code=409, detail="Index: %s vec postoji"%(model.indices))
+    else:
+        logger.info("Index: %s je kreiran, 200"%model.indices)
     return {"message": "data inserted"}
 
 @app.post("/search")
