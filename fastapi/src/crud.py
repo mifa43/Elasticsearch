@@ -8,6 +8,7 @@ import json
 import pyarrow.parquet as parquet
 import pandas
 import pyarrow as pa
+
 class ElasticClass():
     def __init__(self):
         self.es = es = Elasticsearch(host="elastic_container", port= "9200", connection_class=RequestsHttpConnection, max_retries=30,
