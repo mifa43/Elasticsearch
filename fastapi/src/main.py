@@ -115,20 +115,20 @@ async def bulk_insert(model: bulk):
 @app.post("/search")
 async def search(dataModel: SearchModels):
     search_data = ElasticClass().searchData(dataModel.model)
-    print(search_data)
+    logger.info("Search: %s, 200"%search_data)
     return search_data
 
 @app.get("/create-parquet")
 async def parquet():
     parquet_read = ElasticClass().create_parquet()
 
-    print(parquet_read)
+    logger.info("parquet: %s je kreiran, 200"%parquet_read)
     return{"message": "parquet file je kreiran"}
 
 @app.get("/write-parquet-to-elastic")
 async def parquet_to_elastic():
     data = ElasticClass().write_parquet_to_elastic()
-    print(data)
+    logger.info("podatci: %s su uspesno upisani, 200"%data)
 
     return{"message": "file je upisan"}
 
